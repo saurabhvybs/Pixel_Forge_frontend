@@ -8,9 +8,6 @@ interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
 
-console.log('API URL from env:', env.API_URL); // Debug log
-console.log('Platform:', Platform.OS); // Debug log
-
 const api = axios.create({
   baseURL: env.API_URL,
   headers: {
@@ -23,13 +20,16 @@ const api = axios.create({
 
 // Add token to requests if it exists
 api.interceptors.request.use(async (config) => {
-  console.log('Making request to:', `${config.baseURL}${config.url}`, 'with data:', config.data);
-  console.log('Request headers:', config.headers);
-  const token = await AsyncStorage.getItem('userToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  try {
+    const token = await AsyncStorage.getItem('userToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  } catch (error) {
+    console.error('Request interceptor error:', error);
+    return config;
   }
-  return config;
 }, (error) => {
   console.error('Request interceptor error:', error);
   return Promise.reject(error);
@@ -38,7 +38,6 @@ api.interceptors.request.use(async (config) => {
 // Handle token refresh
 api.interceptors.response.use(
   (response) => {
-    console.log('Response received:', response.data);
     return response;
   },
   async (error: AxiosError) => {
@@ -76,16 +75,13 @@ api.interceptors.response.use(
       try {
         const token = await AsyncStorage.getItem('userToken');
         if (!token) throw new Error('No token available');
-        
         // Try to refresh the token
         const response = await api.post('/auth/refresh', { token });
         const { token: newToken } = response.data;
-        
         await AsyncStorage.setItem('userToken', newToken);
         if (originalRequest.headers) {
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
         }
-        
         return api(originalRequest);
       } catch (refreshError) {
         await AsyncStorage.removeItem('userToken');
@@ -107,25 +103,19 @@ api.interceptors.response.use(
 
 export const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
   try {
-    console.log('Attempting login with:', credentials);
-    console.log('Using API URL:', env.API_URL);
-    console.log('Platform:', Platform.OS);
-    
     const response = await api.post<AuthResponse>('/auth/login', credentials);
-    console.log('Login successful:', response.data);
-    
     // Store the token
     if (response.data.token) {
       await AsyncStorage.setItem('userToken', response.data.token);
     }
-    
     return response.data;
   } catch (error) {
     console.error('Login failed:', error);
     if (axios.isAxiosError(error)) {
+      const data = error.response?.data;
       const authError: AuthError = {
-        message: error.response?.data?.message || 'Login failed',
-        code: error.response?.data?.code || error.code,
+        message: (data && typeof data === 'object' && 'message' in data) ? (data as any).message : 'Login failed',
+        code: (data && typeof data === 'object' && 'code' in data) ? (data as any).code : error.code,
         status: error.response?.status,
         platform: Platform.OS
       };
@@ -141,22 +131,19 @@ export const login = async (credentials: LoginCredentials): Promise<AuthResponse
 
 export const signup = async (credentials: SignupCredentials): Promise<AuthResponse> => {
   try {
-    console.log('Attempting signup with:', credentials);
     const response = await api.post<AuthResponse>('/auth/signup', credentials);
-    console.log('Signup successful:', response.data);
-    
     // Store the token
     if (response.data.token) {
       await AsyncStorage.setItem('userToken', response.data.token);
     }
-    
     return response.data;
   } catch (error) {
     console.error('Signup failed:', error);
     if (axios.isAxiosError(error)) {
+      const data = error.response?.data;
       const authError: AuthError = {
-        message: error.response?.data?.message || 'Signup failed',
-        code: error.response?.data?.code || error.code,
+        message: (data && typeof data === 'object' && 'message' in data) ? (data as any).message : 'Signup failed',
+        code: (data && typeof data === 'object' && 'code' in data) ? (data as any).code : error.code,
         status: error.response?.status,
         platform: Platform.OS
       };
@@ -172,9 +159,7 @@ export const signup = async (credentials: SignupCredentials): Promise<AuthRespon
 
 export const logout = async (): Promise<void> => {
   try {
-    console.log('Attempting logout');
     await api.post('/auth/logout');
-    console.log('Logout successful');
   } catch (error) {
     console.error('Logout error:', error);
   } finally {
