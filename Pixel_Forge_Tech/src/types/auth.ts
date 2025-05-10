@@ -2,9 +2,8 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'user' | 'admin';
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface AuthState {
@@ -24,12 +23,17 @@ export interface SignupCredentials extends LoginCredentials {
 }
 
 export interface AuthResponse {
-  user: User;
   token: string;
+  user: {
+    id: string;
+    email: string;
+    name: string;
+  };
 }
 
 export interface AuthError {
   message: string;
   code?: string;
   status?: number;
+  platform?: string;
 } 

@@ -1,29 +1,16 @@
-import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
-const ENV = {
-  dev: {
-    API_URL: process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000/api',
-    APP_NAME: process.env.EXPO_PUBLIC_APP_NAME || 'Pixel Forge Tech',
-  },
-  staging: {
-    API_URL: process.env.EXPO_PUBLIC_API_URL || 'https://staging-api.pixelforge.tech/api',
-    APP_NAME: process.env.EXPO_PUBLIC_APP_NAME || 'Pixel Forge Tech',
-  },
-  prod: {
-    API_URL: process.env.EXPO_PUBLIC_API_URL || 'https://api.pixelforge.tech/api',
-    APP_NAME: process.env.EXPO_PUBLIC_APP_NAME || 'Pixel Forge Tech',
-  },
+const getApiUrl = () => {
+  if (Platform.OS === 'android') {
+    return 'http://10.0.2.2:3000/api';
+  } else if (Platform.OS === 'ios') {
+    return 'http://localhost:3000/api';
+  }
+  // Fallback for web or physical device (replace with your machine's IP if needed)
+  return 'http://192.168.220.239:3000/api';
 };
 
-const getEnvVars = () => {
-  // First try to get environment from .env file
-  const envFromEnvFile = process.env.EXPO_PUBLIC_ENV;
-  // Fallback to expo config
-  const envFromExpo = Constants.expoConfig?.extra?.ENV;
-  // Default to dev if nothing is set
-  const env = envFromEnvFile || envFromExpo || 'dev';
-  
-  return ENV[env as keyof typeof ENV];
+export default {
+  API_URL: getApiUrl(),
+  APP_NAME: 'Pixel Forge Tech',
 };
-
-export default getEnvVars(); 
