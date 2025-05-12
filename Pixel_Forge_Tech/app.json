@@ -20,10 +20,31 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.saurabhgreyorange.Pixel_Forge_Tech",
+      "theme": "@style/Theme.AppCompat.Light.NoActionBar",
+      "backgroundColor": "#ffffff",
+      "softwareKeyboardLayoutMode": "pan",
+      "allowBackup": true,
+      "enableProguardInReleaseBuilds": true,
+      "enableShrinkResources": true,
+      "enableR8": true,
+      "windowSoftInputMode": "adjustResize",
+      "activity": {
+        "launchMode": "singleTask",
+        "taskAffinity": "com.saurabhgreyorange.Pixel_Forge_Tech",
+        "excludeFromRecents": false,
+        "documentLaunchMode": "never",
+        "autoVerify": true
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f1ad127b-5309-499e-bcf6-a68c14fddacf"
+      }
     }
   }
 }

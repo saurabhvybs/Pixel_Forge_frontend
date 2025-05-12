@@ -5,6 +5,7 @@ import { useTasks } from '../../hooks/useTasks';
 import TaskForm from '../../components/TaskForm';
 import { CreateTaskData } from '../../types';
 import { StatusBar } from 'expo-status-bar';
+import { colors } from '../../styles/theme';
 
 const AddTaskScreen = () => {
   const navigation = useNavigation();
@@ -45,10 +46,10 @@ const AddTaskScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.background,
   },
   scrollView: {
     flex: 1,
-    backgroundColor: 'white',
   },
 });
 

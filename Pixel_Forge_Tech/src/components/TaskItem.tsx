@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from './styled';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Task } from '../types';
+import { colors, spacing, typography } from '../styles/theme';
 
 interface TaskItemProps {
   task: Task;
@@ -12,32 +13,35 @@ const TaskItem = ({ task, onToggle, onPress }: TaskItemProps) => {
   return (
     <TouchableOpacity
       onPress={() => onPress(task.id)}
-      className="flex-row items-center p-4 bg-white rounded-lg mb-3 shadow-sm"
+      style={styles.container}
     >
       <TouchableOpacity
         onPress={() => onToggle(task.id, !task.completed)}
-        className={`w-6 h-6 rounded-full border mr-3 items-center justify-center ${
-          task.completed ? 'bg-primary border-primary' : 'border-gray-400'
-        }`}
+        style={[
+          styles.checkbox,
+          task.completed ? styles.checkboxCompleted : styles.checkboxIncomplete
+        ]}
       >
         {task.completed && (
-          <View className="w-3 h-3 bg-white rounded-full" />
+          <View style={styles.checkboxInner} />
         )}
       </TouchableOpacity>
       
-      <View className="flex-1">
+      <View style={styles.content}>
         <Text 
-          className={`text-base font-medium ${
-            task.completed ? 'text-gray-400 line-through' : 'text-gray-800'
-          }`}
+          style={[
+            styles.title,
+            task.completed ? styles.textCompleted : styles.textActive
+          ]}
         >
           {task.title}
         </Text>
         {task.description ? (
           <Text 
-            className={`text-sm mt-1 ${
-              task.completed ? 'text-gray-400' : 'text-gray-600'
-            }`}
+            style={[
+              styles.description,
+              task.completed ? styles.textCompleted : styles.textSecondary
+            ]}
             numberOfLines={2}
           >
             {task.description}
@@ -47,5 +51,64 @@ const TaskItem = ({ task, onToggle, onPress }: TaskItemProps) => {
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: spacing.md,
+    backgroundColor: colors.surface,
+    borderRadius: spacing.sm,
+    marginBottom: spacing.sm,
+    elevation: 1,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    marginRight: spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxCompleted: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  checkboxIncomplete: {
+    borderColor: colors.border,
+  },
+  checkboxInner: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: colors.surface,
+  },
+  content: {
+    flex: 1,
+  },
+  title: {
+    ...typography.body,
+    fontWeight: '500',
+  },
+  description: {
+    ...typography.caption,
+    marginTop: spacing.xs,
+  },
+  textActive: {
+    color: colors.text.primary,
+  },
+  textCompleted: {
+    color: colors.text.secondary,
+    textDecorationLine: 'line-through',
+  },
+  textSecondary: {
+    color: colors.text.secondary,
+  },
+});
 
 export default TaskItem;

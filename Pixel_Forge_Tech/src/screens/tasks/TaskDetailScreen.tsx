@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Alert, 
-  ScrollView 
+  ScrollView,
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
 } from 'react-native';
-import { View, Text, TouchableOpacity } from '../../components/styled';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { TaskStackParamList } from '../../types';
@@ -12,6 +15,7 @@ import Loading from '../../components/Loading';
 import { Task } from '../../types';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
+import { colors, spacing, typography, commonStyles } from '../../styles/theme';
 
 type TaskDetailScreenRouteProp = RouteProp<TaskStackParamList, 'TaskDetail'>;
 type TaskDetailScreenNavigationProp = StackNavigationProp<TaskStackParamList, 'TaskDetail'>;
@@ -42,20 +46,19 @@ const TaskDetailScreen = () => {
     loadTask();
   }, [taskId]);
 
-  // Set header right buttons
   React.useLayoutEffect(() => {
     if (task) {
       navigation.setOptions({
         headerRight: () => (
-          <View className="flex-row mr-4">
+          <View style={styles.headerButtons}>
             <TouchableOpacity
               onPress={() => navigation.navigate('EditTask', { taskId })}
-              className="mr-6"
+              style={styles.headerButton}
             >
-              <Ionicons name="create-outline" size={24} color="white" />
+              <Ionicons name="create-outline" size={24} color={colors.background} />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleDelete}>
-              <Ionicons name="trash-outline" size={24} color="white" />
+              <Ionicons name="trash-outline" size={24} color={colors.background} />
             </TouchableOpacity>
           </View>
         ),
@@ -106,85 +109,88 @@ const TaskDetailScreen = () => {
 
   if (!task) {
     return (
-      <View className="flex-1 justify-center items-center p-4">
-        <Text className="text-lg text-gray-600">Task not found</Text>
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Task not found</Text>
         <TouchableOpacity
-          className="mt-4 bg-primary py-2 px-6 rounded-lg"
+          style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Text className="text-white">Go Back</Text>
+          <Text style={styles.backButtonText}>Go Back</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-white">
+    <View style={styles.container}>
       <StatusBar style="light" />
       <ScrollView>
-        <View className="p-6">
-          <View className="flex-row items-center mb-6">
+        <View style={styles.content}>
+          <View style={styles.titleContainer}>
             <TouchableOpacity
               onPress={handleToggleStatus}
-              className={`w-8 h-8 rounded-full border-2 mr-4 items-center justify-center ${
-                task.completed ? 'bg-primary border-primary' : 'border-gray-400'
-              }`}
+              style={[
+                styles.checkbox,
+                task.completed && styles.checkboxCompleted
+              ]}
             >
               {task.completed && (
-                <Ionicons name="checkmark" size={20} color="white" />
+                <Ionicons name="checkmark" size={20} color={colors.background} />
               )}
             </TouchableOpacity>
             
-            <Text 
-              className={`text-2xl font-semibold ${
-                task.completed ? 'text-gray-400 line-through' : 'text-gray-800'
-              }`}
-            >
+            <Text style={[
+              styles.title,
+              task.completed && styles.titleCompleted
+            ]}>
               {task.title}
             </Text>
           </View>
 
           {task.description ? (
-            <View className="mt-2 mb-6">
-              <Text className="text-gray-600 text-lg leading-relaxed">
+            <View style={styles.descriptionContainer}>
+              <Text style={styles.description}>
                 {task.description}
               </Text>
             </View>
           ) : null}
 
-          <View className="mt-8 pt-6 border-t border-gray-200">
-            <Text className="text-gray-500 mb-2">
-              Status: <Text className={task.completed ? "text-green-600 font-medium" : "text-orange-500 font-medium"}>
+          <View style={styles.metadataContainer}>
+            <Text style={styles.metadataText}>
+              Status: <Text style={[
+                styles.metadataValue,
+                task.completed ? styles.statusCompleted : styles.statusPending
+              ]}>
                 {task.completed ? 'Completed' : 'Pending'}
               </Text>
             </Text>
-            <Text className="text-gray-500">
+            <Text style={styles.metadataText}>
               Created: {new Date(task.createdAt).toLocaleString()}
             </Text>
-            <Text className="text-gray-500">
+            <Text style={styles.metadataText}>
               Last updated: {new Date(task.updatedAt).toLocaleString()}
             </Text>
           </View>
 
-          <View className="mt-8 flex-row">
+          <View style={styles.actionButtons}>
             <TouchableOpacity
               onPress={() => navigation.navigate('EditTask', { taskId })}
-              className="flex-1 bg-primary py-3 rounded-lg mr-2 flex-row justify-center items-center"
+              style={[styles.actionButton, styles.editButton]}
             >
-              <Ionicons name="create-outline" size={20} color="white" />
-              <Text className="text-white font-medium ml-2">Edit Task</Text>
+              <Ionicons name="create-outline" size={20} color={colors.background} />
+              <Text style={styles.actionButtonText}>Edit Task</Text>
             </TouchableOpacity>
             
             <TouchableOpacity
               onPress={handleToggleStatus}
-              className="flex-1 bg-secondary py-3 rounded-lg ml-2 flex-row justify-center items-center"
+              style={[styles.actionButton, styles.toggleButton]}
             >
               <Ionicons 
                 name={task.completed ? "refresh-outline" : "checkmark-circle-outline"} 
                 size={20}
-                color="white" 
+                color={colors.background} 
               />
-              <Text className="text-white font-medium ml-2">
+              <Text style={styles.actionButtonText}>
                 {task.completed ? 'Mark as Pending' : 'Mark as Complete'}
               </Text>
             </TouchableOpacity>
@@ -194,5 +200,117 @@ const TaskDetailScreen = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    marginRight: spacing.md,
+  },
+  headerButton: {
+    marginRight: spacing.lg,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.md,
+  },
+  errorText: {
+    ...typography.h3,
+    color: colors.text.secondary,
+  },
+  backButton: {
+    ...commonStyles.button,
+    marginTop: spacing.md,
+    paddingHorizontal: spacing.lg,
+  },
+  backButtonText: {
+    ...commonStyles.buttonText,
+  },
+  content: {
+    padding: spacing.xl,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.lg,
+  },
+  checkbox: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: colors.text.light,
+    marginRight: spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxCompleted: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  title: {
+    ...typography.h1,
+    flex: 1,
+  },
+  titleCompleted: {
+    color: colors.text.light,
+    textDecorationLine: 'line-through',
+  },
+  descriptionContainer: {
+    marginBottom: spacing.lg,
+  },
+  description: {
+    ...typography.body,
+    lineHeight: 24,
+  },
+  metadataContainer: {
+    marginTop: spacing.xl,
+    paddingTop: spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  metadataText: {
+    ...typography.body,
+    color: colors.text.secondary,
+    marginBottom: spacing.xs,
+  },
+  metadataValue: {
+    fontWeight: '600',
+  },
+  statusCompleted: {
+    color: colors.success,
+  },
+  statusPending: {
+    color: colors.error,
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    marginTop: spacing.xl,
+    gap: spacing.md,
+  },
+  actionButton: {
+    flex: 1,
+    height: 48,
+    borderRadius: 8,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  editButton: {
+    backgroundColor: colors.primary,
+  },
+  toggleButton: {
+    backgroundColor: colors.secondary,
+  },
+  actionButtonText: {
+    ...commonStyles.buttonText,
+    marginLeft: spacing.xs,
+  },
+});
 
 export default TaskDetailScreen;

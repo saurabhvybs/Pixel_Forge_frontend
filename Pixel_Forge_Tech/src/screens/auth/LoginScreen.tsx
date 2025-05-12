@@ -4,14 +4,19 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
-  StyleSheet
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
 } from 'react-native';
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from '../../components/styled';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { AuthStackParamList } from '../../types';
 import { AuthContext } from '../../context/AuthContext';
 import { StatusBar } from 'expo-status-bar';
+import { colors, spacing, typography, commonStyles } from '../../styles/theme';
 
 type LoginScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Login'>;
 
@@ -59,18 +64,19 @@ const LoginScreen = () => {
       style={styles.container}
     >
       <StatusBar style="dark" />
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View className="flex-1 justify-center px-8 py-16 bg-white">
-          <View className="mb-8 items-center">
-            <Text className="text-3xl font-bold text-gray-800">Task Manager</Text>
-            <Text className="text-gray-500 mt-2">Login to your account</Text>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.content}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Task Manager</Text>
+            <Text style={styles.subtitle}>Login to your account</Text>
           </View>
           
-          <View className="mb-6">
-            <Text className="text-gray-700 mb-2 font-medium">Email</Text>
+          <View style={styles.form}>
+            <Text style={styles.label}>Email</Text>
             <TextInput
-              className="border border-gray-300 rounded-lg p-3 bg-gray-50"
+              style={styles.input}
               placeholder="Enter your email"
+              placeholderTextColor={colors.text.light}
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -78,11 +84,12 @@ const LoginScreen = () => {
             />
           </View>
           
-          <View className="mb-8">
-            <Text className="text-gray-700 mb-2 font-medium">Password</Text>
+          <View style={styles.form}>
+            <Text style={styles.label}>Password</Text>
             <TextInput
-              className="border border-gray-300 rounded-lg p-3 bg-gray-50"
+              style={styles.input}
               placeholder="Enter your password"
+              placeholderTextColor={colors.text.light}
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -90,21 +97,21 @@ const LoginScreen = () => {
           </View>
           
           <TouchableOpacity
-            className={`rounded-lg p-4 ${isSubmitting ? 'bg-primary-light' : 'bg-primary'}`}
+            style={[styles.button, isSubmitting && styles.buttonDisabled]}
             onPress={handleLogin}
             disabled={isSubmitting}
           >
             {isSubmitting ? (
-              <ActivityIndicator color="#ffffff" />
+              <ActivityIndicator color={colors.background} />
             ) : (
-              <Text className="text-white font-semibold text-center">Login</Text>
+              <Text style={styles.buttonText}>Login</Text>
             )}
           </TouchableOpacity>
           
-          <View className="flex-row justify-center mt-6">
-            <Text className="text-gray-600">Don't have an account? </Text>
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Don't have an account? </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-              <Text className="text-primary font-semibold">Sign up</Text>
+              <Text style={styles.footerLink}>Sign up</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -116,6 +123,62 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.background,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  content: {
+    flex: 1,
+    padding: spacing.xl,
+    justifyContent: 'center',
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: spacing.xl,
+  },
+  title: {
+    ...typography.h1,
+    marginBottom: spacing.xs,
+  },
+  subtitle: {
+    ...typography.body,
+    color: colors.text.secondary,
+  },
+  form: {
+    marginBottom: spacing.lg,
+  },
+  label: {
+    ...typography.body,
+    marginBottom: spacing.xs,
+    fontWeight: '500',
+  },
+  input: {
+    ...commonStyles.input,
+  },
+  button: {
+    ...commonStyles.button,
+    marginTop: spacing.md,
+  },
+  buttonDisabled: {
+    backgroundColor: colors.primaryLight,
+  },
+  buttonText: {
+    ...commonStyles.buttonText,
+  },
+  footer: {
+    ...commonStyles.row,
+    justifyContent: 'center',
+    marginTop: spacing.xl,
+  },
+  footerText: {
+    ...typography.body,
+    color: colors.text.secondary,
+  },
+  footerLink: {
+    ...typography.body,
+    color: colors.primary,
+    fontWeight: '600',
   },
 });
 

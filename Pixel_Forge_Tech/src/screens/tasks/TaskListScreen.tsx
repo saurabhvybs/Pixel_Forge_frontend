@@ -2,9 +2,12 @@ import React, { useCallback } from 'react';
 import {
   FlatList,
   RefreshControl,
-  Alert
+  Alert,
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
 } from 'react-native';
-import { View, Text, TouchableOpacity } from '../../components/styled';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { TaskStackParamList } from '../../types';
@@ -14,6 +17,7 @@ import TaskItem from '../../components/TaskItem';
 import Loading from '../../components/Loading';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
+import { colors, spacing, typography, commonStyles } from '../../styles/theme';
 
 type TaskListScreenNavigationProp = StackNavigationProp<TaskStackParamList, 'TaskList'>;
 
@@ -51,15 +55,15 @@ const TaskListScreen = () => {
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <View className="flex-row mr-4">
+        <View style={styles.headerButtons}>
           <TouchableOpacity
             onPress={() => navigation.navigate('AddTask')}
-            className="mr-6"
+            style={styles.headerButton}
           >
-            <Ionicons name="add" size={24} color="white" />
+            <Ionicons name="add" size={24} color={colors.background} />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleSignOut}>
-            <Ionicons name="log-out-outline" size={24} color="white" />
+            <Ionicons name="log-out-outline" size={24} color={colors.background} />
           </TouchableOpacity>
         </View>
       ),
@@ -80,32 +84,32 @@ const TaskListScreen = () => {
 
   if (error) {
     return (
-      <View className="flex-1 justify-center items-center p-4">
-        <Text className="text-red-500 mb-4 text-center">{error}</Text>
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error}</Text>
         <TouchableOpacity
-          className="bg-primary rounded-lg py-3 px-6"
+          style={styles.retryButton}
           onPress={fetchTasks}
         >
-          <Text className="text-white font-medium">Try Again</Text>
+          <Text style={styles.retryButtonText}>Try Again</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-gray-100">
+    <View style={styles.container}>
       <StatusBar style="light" />
       {tasks.length === 0 ? (
-        <View className="flex-1 justify-center items-center p-8">
-          <Ionicons name="list" size={64} color="#d1d5db" />
-          <Text className="text-xl text-gray-600 mt-4 text-center">
+        <View style={styles.emptyContainer}>
+          <Ionicons name="list" size={64} color={colors.text.light} />
+          <Text style={styles.emptyText}>
             You don't have any tasks yet
           </Text>
           <TouchableOpacity
-            className="mt-6 bg-primary py-3 px-6 rounded-lg"
+            style={styles.addButton}
             onPress={() => navigation.navigate('AddTask')}
           >
-            <Text className="text-white font-semibold">Add Your First Task</Text>
+            <Text style={styles.addButtonText}>Add Your First Task</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -119,12 +123,12 @@ const TaskListScreen = () => {
               onPress={handleTaskPress}
             />
           )}
-          contentContainerStyle={{ padding: 16 }}
+          contentContainerStyle={styles.listContent}
           refreshControl={
             <RefreshControl
               refreshing={loading}
               onRefresh={fetchTasks}
-              colors={['#4f46e5']}
+              colors={[colors.primary]}
             />
           }
         />
@@ -132,5 +136,61 @@ const TaskListScreen = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.surface,
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    marginRight: spacing.md,
+  },
+  headerButton: {
+    marginRight: spacing.lg,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.md,
+  },
+  errorText: {
+    ...typography.body,
+    color: colors.error,
+    marginBottom: spacing.md,
+    textAlign: 'center',
+  },
+  retryButton: {
+    ...commonStyles.button,
+    paddingHorizontal: spacing.lg,
+  },
+  retryButtonText: {
+    ...commonStyles.buttonText,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.xl,
+  },
+  emptyText: {
+    ...typography.h2,
+    color: colors.text.secondary,
+    marginTop: spacing.md,
+    textAlign: 'center',
+  },
+  addButton: {
+    ...commonStyles.button,
+    marginTop: spacing.xl,
+    paddingHorizontal: spacing.lg,
+  },
+  addButtonText: {
+    ...commonStyles.buttonText,
+  },
+  listContent: {
+    padding: spacing.md,
+  },
+});
 
 export default TaskListScreen;

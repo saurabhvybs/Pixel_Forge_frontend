@@ -4,9 +4,9 @@ import {
   KeyboardAvoidingView, 
   Platform, 
   ScrollView,
-  StyleSheet
+  StyleSheet,
+  View,
 } from 'react-native';
-import { View } from '../../components/styled';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { TaskStackParamList } from '../../types';
 import { useTasks } from '../../hooks/useTasks';
@@ -14,6 +14,7 @@ import TaskForm from '../../components/TaskForm';
 import Loading from '../../components/Loading';
 import { CreateTaskData } from '../../types';
 import { StatusBar } from 'expo-status-bar';
+import { colors } from '../../styles/theme';
 
 type EditTaskScreenRouteProp = RouteProp<TaskStackParamList, 'EditTask'>;
 
@@ -93,10 +94,10 @@ const EditTaskScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.background,
   },
   scrollView: {
     flex: 1,
-    backgroundColor: 'white',
   },
 });
 
